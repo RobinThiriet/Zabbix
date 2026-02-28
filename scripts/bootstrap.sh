@@ -10,9 +10,9 @@ ENABLE_AUTOSCALE_STACK="$(grep -E '^ENABLE_AUTOSCALE_STACK=' "$ENV_FILE" 2>/dev/
 ENABLE_AUTOSCALE_STACK="${ENABLE_AUTOSCALE_STACK:-false}"
 
 if [[ "$ENABLE_AUTOSCALE_STACK" == "true" ]]; then
-  echo "[bootstrap] ENABLE_AUTOSCALE_STACK=true -> running scenario C2"
-  exec "$ROOT_DIR/scripts/scenario_c2.sh"
+  echo "[bootstrap] ENABLE_AUTOSCALE_STACK=true -> running C2 (machine vierge)"
+  exec "$ROOT_DIR/scripts/run_consigne_2_machine_vierge.sh"
 else
-  echo "[bootstrap] ENABLE_AUTOSCALE_STACK=false -> running scenario C3"
-  exec "$ROOT_DIR/scripts/scenario_c3.sh"
+  echo "[bootstrap] ENABLE_AUTOSCALE_STACK=false -> running C3 (trois machines)"
+  exec "$ROOT_DIR/scripts/run_consigne_3_trois_machines.sh"
 fi

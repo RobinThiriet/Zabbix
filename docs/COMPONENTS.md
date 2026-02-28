@@ -13,10 +13,13 @@ Stack C3: 3 machines logiques, chacune avec:
 - 1 agent zabbix
 
 ## `scripts/`
-- `scenario_c1.sh`: execute C1
-- `scenario_c2.sh`: execute C1 + C2
-- `scenario_c3.sh`: execute C1 + C3
-- `scenario_reset.sh`: stop/down propre
-- `cleanup_stale_hosts.sh`: supprime hôtes techniques stale
+- `run_consigne_1_core.sh`: execute C1
+- `run_consigne_2_machine_vierge.sh`: execute C1 + C2
+- `run_consigne_3_trois_machines.sh`: execute C1 + C3
+- `reset_lab.sh`: stop/down propre
+- `cleanup_hosts.sh`: supprime hotes techniques stale
 - `configure_autoregistration.sh`: configure actions + corrige host local
 - `bootstrap.sh`: route automatiquement vers C2 ou C3
+
+## `Makefile`
+- `make c1`, `make c2`, `make c3`, `make reset`, `make cleanup`, etc.

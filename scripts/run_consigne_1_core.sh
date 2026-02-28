@@ -25,6 +25,6 @@ for _ in {1..60}; do
 done
 
 "$ROOT_DIR/scripts/configure_autoregistration.sh"
-"$ROOT_DIR/scripts/cleanup_stale_hosts.sh" --mode c1 --apply
+"$ROOT_DIR/scripts/cleanup_hosts.sh" --mode c1 --apply
 
 echo "[C1] Ready: http://localhost:${ZABBIX_WEB_PORT:-8080}"

@@ -62,39 +62,39 @@ cp .env.example .env
 
 - C1 seulement:
 ```bash
-./scripts/scenario_c1.sh
+./scripts/run_consigne_1_core.sh
 ```
 
 - C2 (C1 + agents `agent-1..4`):
 ```bash
-./scripts/scenario_c2.sh
+./scripts/run_consigne_2_machine_vierge.sh
 ```
 
 - C3 (C1 + 3 machines web/api/agent):
 ```bash
-./scripts/scenario_c3.sh
+./scripts/run_consigne_3_trois_machines.sh
 ```
 
 - Reset propre:
 ```bash
-./scripts/scenario_reset.sh
+./scripts/reset_lab.sh
 ```
 
 ## Nettoyage des hotes parasites
 
 ```bash
 # Apercu
-./scripts/cleanup_stale_hosts.sh --dry-run
+./scripts/cleanup_hosts.sh --dry-run
 
 # Suppression
-./scripts/cleanup_stale_hosts.sh --apply
+./scripts/cleanup_hosts.sh --apply
 ```
 
 ## Script principal
 
 `./scripts/bootstrap.sh` choisit automatiquement:
-- `scenario_c2.sh` si `ENABLE_AUTOSCALE_STACK=true`
-- sinon `scenario_c3.sh`
+- `run_consigne_2_machine_vierge.sh` si `ENABLE_AUTOSCALE_STACK=true`
+- sinon `run_consigne_3_trois_machines.sh`
 
 ## Documentation detaillee
 

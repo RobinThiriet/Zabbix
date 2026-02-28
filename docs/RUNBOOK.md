@@ -10,7 +10,7 @@ cp .env.example .env
 ## C1 - Zabbix Server/Web/DB
 
 ```bash
-./scripts/scenario_c1.sh
+./scripts/run_consigne_1_core.sh
 ```
 
 Validation:
@@ -20,7 +20,7 @@ Validation:
 ## C2 - Machine vierge (auto-discovery/template)
 
 ```bash
-./scripts/scenario_c2.sh
+./scripts/run_consigne_2_machine_vierge.sh
 ```
 
 Validation:
@@ -30,7 +30,7 @@ Validation:
 ## C3 - 3 machines web+api+agent
 
 ```bash
-./scripts/scenario_c3.sh
+./scripts/run_consigne_3_trois_machines.sh
 ```
 
 Validation:
@@ -43,16 +43,16 @@ Validation:
 ## Nettoyage hôtes techniques
 
 ```bash
-./scripts/cleanup_stale_hosts.sh --apply
+./scripts/cleanup_hosts.sh --apply
 ```
 
 ## Reset global
 
 ```bash
-./scripts/scenario_reset.sh
+./scripts/reset_lab.sh
 ```
 
 Reset complet:
 ```bash
-./scripts/scenario_reset.sh --purge-data --purge-images
+./scripts/reset_lab.sh --purge-data --purge-images
 ```
