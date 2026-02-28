@@ -17,13 +17,13 @@ Plateforme de supervision Docker, clonable et reconfigurable via un seul fichier
 
 ```mermaid
 flowchart TB
-  User[Admin Browser\nhttp://localhost:${ZABBIX_WEB_PORT}] --> ZW
+  User[Admin Browser\nhttp://localhost:8080] --> ZW
 
   subgraph Core[Core Zabbix Stack]
     PG[(PostgreSQL)]
-    ZS[Zabbix Server\n:${ZABBIX_SERVER_PORT}]
-    ZW[Zabbix Web]
-    ZA0[Local Agent\n:${ZABBIX_AGENT_PORT}]
+    ZS[Zabbix Server\n:10051]
+    ZW[Zabbix Web\n:8080]
+    ZA0[Local Agent\n:10050]
     ZW --> ZS
     ZS --> PG
     ZS --> ZA0
@@ -31,23 +31,45 @@ flowchart TB
 
   subgraph AppStack[Application Monitoring Stack]
     subgraph M1[Machine 1]
-      W1[web-machine-1\n:${APP_MACHINE1_WEB_PORT}] --> A1[api-machine-1]
+      N1[machine-1]
+      W1[web-machine-1\n:8181]
+      A1[api-machine-1]
       AG1[zbx-agent-machine-1]
+      N1 --> W1
+      N1 --> AG1
+      W1 -->|/api| A1
     end
     subgraph M2[Machine 2]
-      W2[web-machine-2\n:${APP_MACHINE2_WEB_PORT}] --> A2[api-machine-2]
+      N2[machine-2]
+      W2[web-machine-2\n:8082]
+      A2[api-machine-2]
       AG2[zbx-agent-machine-2]
+      N2 --> W2
+      N2 --> AG2
+      W2 -->|/api| A2
     end
     subgraph M3[Machine 3]
-      W3[web-machine-3\n:${APP_MACHINE3_WEB_PORT}] --> A3[api-machine-3]
+      N3[machine-3]
+      W3[web-machine-3\n:8083]
+      A3[api-machine-3]
       AG3[zbx-agent-machine-3]
+      N3 --> W3
+      N3 --> AG3
+      W3 -->|/api| A3
     end
   end
 
   AG1 -->|active checks| ZS
   AG2 -->|active checks| ZS
   AG3 -->|active checks| ZS
+
+  subgraph Autoscale[Autoscale Agents]
+    AA[zbx-agent-autoscale-xN]
+  end
+  AA -->|active checks| ZS
 ```
+
+Ports are configurable via `.env` (`ZABBIX_WEB_PORT`, `APP_MACHINE*_WEB_PORT`, etc.).
 
 ## Arborescence
 
