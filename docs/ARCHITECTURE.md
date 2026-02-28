@@ -22,32 +22,47 @@
 
 ## Schema logique
 
-```text
-                        +--------------------------+
-                        |      zabbix_default      |
-                        |                          |
-                        |  +--------------------+  |
-                        |  | zabbix-server:10051|  |
-                        |  +---------+----------+  |
-                        |            |             |
-                        |  +---------v----------+  |
-                        |  | zbx-agent-machine-1|  |
-                        |  | zbx-agent-machine-2|  |
-                        |  | zbx-agent-machine-3|  |
-                        |  | zbx-agent-autoscale|  |
-                        |  +--------------------+  |
-                        +--------------------------+
+```mermaid
+flowchart TB
+  subgraph Core[Reseau zabbix_default]
+    ZS[zabbix-server:10051]
+    ZA0[zbx-agent (local)]
+    ZS --> ZA0
+  end
 
-+--------------------------------------------------------------+
-|                            lab                               |
-|  +---------------+      +---------------+      +----------+  |
-|  | web-machine-1 | ---> | api-machine-1 |      | port8181 |  |
-|  +---------------+      +---------------+      +----------+  |
-|  +---------------+      +---------------+      +----------+  |
-|  | web-machine-2 | ---> | api-machine-2 |      | port8082 |  |
-|  +---------------+      +---------------+      +----------+  |
-|  +---------------+      +---------------+      +----------+  |
-|  | web-machine-3 | ---> | api-machine-3 |      | port8083 |  |
-|  +---------------+      +---------------+      +----------+  |
-+--------------------------------------------------------------+
+  subgraph Lab[Reseau lab - Application Monitoring Stack]
+    subgraph M1[Machine 1]
+      N1[machine-1]
+      W1[web-machine-1 :8181]
+      A1[api-machine-1]
+      AG1[zbx-agent-machine-1]
+      N1 --> W1
+      N1 --> AG1
+      W1 -->|/api| A1
+    end
+
+    subgraph M2[Machine 2]
+      N2[machine-2]
+      W2[web-machine-2 :8082]
+      A2[api-machine-2]
+      AG2[zbx-agent-machine-2]
+      N2 --> W2
+      N2 --> AG2
+      W2 -->|/api| A2
+    end
+
+    subgraph M3[Machine 3]
+      N3[machine-3]
+      W3[web-machine-3 :8083]
+      A3[api-machine-3]
+      AG3[zbx-agent-machine-3]
+      N3 --> W3
+      N3 --> AG3
+      W3 -->|/api| A3
+    end
+  end
+
+  AG1 -->|active checks| ZS
+  AG2 -->|active checks| ZS
+  AG3 -->|active checks| ZS
 ```

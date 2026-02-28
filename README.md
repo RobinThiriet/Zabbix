@@ -24,7 +24,7 @@ Ce projet fournit un environnement prêt pour:
 ## Schema d'architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
   User[Admin Browser\nhttp://localhost:8080] --> ZW
 
   subgraph Core[Core Zabbix Stack]
@@ -45,22 +45,45 @@ flowchart LR
   end
 
   subgraph Apps[Application Monitoring Stack]
-    W1[web-machine-1\n:8181] --> A1[api-machine-1]
-    W2[web-machine-2\n:8082] --> A2[api-machine-2]
-    W3[web-machine-3\n:8083] --> A3[api-machine-3]
-    AG1[zbx-agent-machine-1]
-    AG2[zbx-agent-machine-2]
-    AG3[zbx-agent-machine-3]
+    subgraph M1[Machine 1]
+      N1[machine-1]
+      W1[web-machine-1\n:8181]
+      A1[api-machine-1]
+      AG1[zbx-agent-machine-1]
+      N1 --> W1
+      N1 --> AG1
+      W1 -->|/api| A1
+    end
+
+    subgraph M2[Machine 2]
+      N2[machine-2]
+      W2[web-machine-2\n:8082]
+      A2[api-machine-2]
+      AG2[zbx-agent-machine-2]
+      N2 --> W2
+      N2 --> AG2
+      W2 -->|/api| A2
+    end
+
+    subgraph M3[Machine 3]
+      N3[machine-3]
+      W3[web-machine-3\n:8083]
+      A3[api-machine-3]
+      AG3[zbx-agent-machine-3]
+      N3 --> W3
+      N3 --> AG3
+      W3 -->|/api| A3
+    end
   end
 
-  AA1 --> ZS
-  AA2 --> ZS
-  AA3 --> ZS
-  AA4 --> ZS
+  AG1 -->|active checks| ZS
+  AG2 -->|active checks| ZS
+  AG3 -->|active checks| ZS
 
-  AG1 --> ZS
-  AG2 --> ZS
-  AG3 --> ZS
+  AA1 -->|active checks| ZS
+  AA2 -->|active checks| ZS
+  AA3 -->|active checks| ZS
+  AA4 -->|active checks| ZS
 ```
 
 ## Composants
