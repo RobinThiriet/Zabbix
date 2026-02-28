@@ -115,6 +115,7 @@ Variables principales:
 - `ZABBIX_SERVER_PORT`
 - `ZABBIX_AGENT_PORT`
 - `APP_MACHINE1_WEB_PORT`, `APP_MACHINE2_WEB_PORT`, `APP_MACHINE3_WEB_PORT`
+- `ENABLE_AUTOSCALE_STACK` (`false` par defaut)
 
 ## Lancement complet
 
@@ -122,6 +123,14 @@ Variables principales:
 cd /root/Zabbix
 ./scripts/bootstrap.sh
 ```
+
+Par defaut, le bootstrap lance uniquement:
+- core Zabbix
+- stack applicative `machine-1/2/3`
+
+Si tu veux aussi les anciens agents autoscale:
+1. mettre `ENABLE_AUTOSCALE_STACK=true` dans `.env`
+2. relancer `./scripts/bootstrap.sh`
 
 ## Destruction propre
 

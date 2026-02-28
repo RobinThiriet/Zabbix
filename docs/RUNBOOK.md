@@ -10,6 +10,7 @@ cp .env.example .env
 Renseigner au minimum:
 - `POSTGRES_PASSWORD`
 - ports si conflit local (`ZABBIX_WEB_PORT`, `APP_MACHINE*_WEB_PORT`, etc.)
+- `ENABLE_AUTOSCALE_STACK=false` (recommande pour un environnement lisible)
 
 ## 2) Deploiement complet
 
@@ -17,6 +18,11 @@ Renseigner au minimum:
 cd /root/Zabbix
 ./scripts/bootstrap.sh
 ```
+
+Par defaut, seuls `machine-1`, `machine-2`, `machine-3` sont provisionnes.
+Pour lancer aussi les anciens agents autoscale:
+1. passer `ENABLE_AUTOSCALE_STACK=true` dans `.env`
+2. relancer `./scripts/bootstrap.sh`
 
 ## 3) Verification rapide
 

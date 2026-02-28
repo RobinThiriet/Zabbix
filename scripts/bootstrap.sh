@@ -8,6 +8,8 @@ ENV_FILE="$ROOT_DIR/.env"
 ZBX_DIR="$ROOT_DIR/Zabbix"
 AGENT_DIR="$ROOT_DIR/Agent-Zabbix"
 APP_DIR="$ROOT_DIR/App/microservice_python"
+ENABLE_AUTOSCALE_STACK="$(grep -E '^ENABLE_AUTOSCALE_STACK=' "$ENV_FILE" 2>/dev/null | tail -n1 | cut -d= -f2- || true)"
+ENABLE_AUTOSCALE_STACK="${ENABLE_AUTOSCALE_STACK:-false}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "ERROR: missing $ENV_FILE"
@@ -30,8 +32,12 @@ done
 echo "[3/5] Configuring auto-registration actions..."
 "$ROOT_DIR/scripts/configure_autoregistration.sh"
 
-echo "[4/5] Starting autoscale agents..."
-docker compose --env-file "$ENV_FILE" -f "$AGENT_DIR/docker-compose.yaml" up -d --scale zbx-agent-autoscale=4
+if [[ "$ENABLE_AUTOSCALE_STACK" == "true" ]]; then
+  echo "[4/5] Starting autoscale agents..."
+  docker compose --env-file "$ENV_FILE" -f "$AGENT_DIR/docker-compose.yaml" up -d --scale zbx-agent-autoscale=4
+else
+  echo "[4/5] Autoscale agents disabled (ENABLE_AUTOSCALE_STACK=false)."
+fi
 
 echo "[5/5] Starting application monitoring stack (3 machines)..."
 docker compose --env-file "$ENV_FILE" -f "$APP_DIR/monitoring-compose.yml" up -d --build
