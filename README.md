@@ -1,55 +1,88 @@
-# Plateforme de supervision Zabbix (reproductible)
+# Zabbix Supervision Lab
 
-Ce depot permet de reconstruire a l'identique une plateforme de supervision basee sur Zabbix avec:
+Plateforme de supervision complete et reproductible basee sur Zabbix, structuree pour etre recreee a la demande depuis GitHub.
 
-- `Zabbix Server + Web + PostgreSQL` dans `/root/Zabbix/Zabbix`
-- `Anciens agents autoscale` dans `/root/Zabbix/Agent-Zabbix`
-- `3 machines applicatives` (web + API REST Python + agent Zabbix) dans `/root/Zabbix/App/microservice_python`
+## Objectif
 
-L'objectif est de pouvoir supprimer l'environnement local puis le recreer rapidement depuis GitHub.
+Ce projet fournit un environnement prêt pour:
+- supervision infrastructure (Zabbix Server, agents Linux)
+- supervision applicative (3 machines logiques web + API REST Python)
+- auto-registration des hotes via metadata
+- deploiement et destruction automatises
 
-## Arborescence
+## Architecture du projet
 
 ```text
-.
-├── Zabbix/
-│   └── docker-compose.yaml
-├── Agent-Zabbix/
-│   └── docker-compose.yaml
-├── App/
-│   └── microservice_python/
-│       ├── monitoring-compose.yml
-│       ├── docker-compose.yml
-│       ├── microservice_user/
-│       ├── microservice_product/
-│       ├── microservice_order/
-│       └── nginx/
-├── docs/
-│   └── ARCHITECTURE.md
-└── scripts/
-    ├── bootstrap.sh
-    └── configure_autoregistration.sh
+/root/Zabbix
+├── Zabbix/                # stack coeur (DB + server + web + agent local)
+├── Agent-Zabbix/          # stack agents autoscale
+├── App/microservice_python/ # stack applicative 3 machines + agents
+├── docs/                  # documentation architecture
+└── scripts/               # bootstrap, autoreg, destroy
 ```
 
-## Architecture reseau
+## Schema d'architecture
 
-Voir le detail dans [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+```mermaid
+flowchart LR
+  User[Admin Browser\nhttp://localhost:8080] --> ZW
 
-Resume:
-- Reseau `zabbix_default`: coeur Zabbix + agents
-- Reseau `lab`: web/api des 3 machines
-- Exposition web machines:
-  - machine-1: `8181`
-  - machine-2: `8082`
-  - machine-3: `8083`
-- Interface Zabbix: `8080`
+  subgraph Core[Core Zabbix Stack]
+    PG[(PostgreSQL)]
+    ZS[Zabbix Server\n:10051]
+    ZW[Zabbix Web\n:8080]
+    ZA0[Local Agent\n:10050]
+    ZW --> ZS
+    ZS --> PG
+    ZS --> ZA0
+  end
+
+  subgraph Agents[Autoscale Agents Stack]
+    AA1[zbx-agent-autoscale-1]
+    AA2[zbx-agent-autoscale-2]
+    AA3[zbx-agent-autoscale-3]
+    AA4[zbx-agent-autoscale-4]
+  end
+
+  subgraph Apps[Application Monitoring Stack]
+    W1[web-machine-1\n:8181] --> A1[api-machine-1]
+    W2[web-machine-2\n:8082] --> A2[api-machine-2]
+    W3[web-machine-3\n:8083] --> A3[api-machine-3]
+    AG1[zbx-agent-machine-1]
+    AG2[zbx-agent-machine-2]
+    AG3[zbx-agent-machine-3]
+  end
+
+  AA1 --> ZS
+  AA2 --> ZS
+  AA3 --> ZS
+  AA4 --> ZS
+
+  AG1 --> ZS
+  AG2 --> ZS
+  AG3 --> ZS
+```
+
+## Composants
+
+- `Zabbix/docker-compose.yaml`
+  - PostgreSQL
+  - Zabbix Server
+  - Zabbix Web
+  - Agent local
+- `Agent-Zabbix/docker-compose.yaml`
+  - Agent autoscale (scalable via `--scale`)
+- `App/microservice_python/monitoring-compose.yml`
+  - 3 APIs Flask
+  - 3 frontaux Nginx
+  - 3 agents Zabbix dedies
 
 ## Prerequis
 
-- Docker + plugin Docker Compose
-- Ports disponibles: `8080`, `10050`, `10051`, `8181`, `8082`, `8083`
+- Docker Engine + Docker Compose plugin
+- Ports libres: `8080`, `10050`, `10051`, `8181`, `8082`, `8083`
 
-## Deploiement rapide (recommande)
+## Deploiement rapide
 
 ```bash
 cd /root/Zabbix
@@ -57,51 +90,51 @@ cd /root/Zabbix
 ```
 
 Ce script:
-1. demarre Zabbix
+1. lance le core Zabbix
 2. configure les actions d'auto-registration via API
-3. demarre les agents autoscale
-4. demarre les 3 machines (web + API + agent)
-
-## Deploiement manuel
-
-```bash
-# 1) Coeur Zabbix
-cd /root/Zabbix/Zabbix
-docker compose -f docker-compose.yaml up -d
-
-# 2) Actions auto-registration
-cd /root/Zabbix
-./scripts/configure_autoregistration.sh
-
-# 3) Agents autoscale
-cd /root/Zabbix/Agent-Zabbix
-docker compose -f docker-compose.yaml up -d --scale zbx-agent-autoscale=4
-
-# 4) Stack 3 machines
-cd /root/Zabbix/App/microservice_python
-docker compose -f monitoring-compose.yml up -d --build
-```
+3. lance les agents autoscale
+4. lance la stack applicative 3 machines
 
 ## Verification
 
-- Zabbix UI: `http://localhost:8080` (`Admin` / `zabbix`)
-- Hosts attendus: `machine-1`, `machine-2`, `machine-3`, `agent-*`
-- Endpoints applicatifs:
+- UI Zabbix: `http://localhost:8080` (`Admin` / `zabbix`)
+- Endpoints web:
+  - `http://localhost:8181`
+  - `http://localhost:8082`
+  - `http://localhost:8083`
+- Endpoints API:
   - `http://localhost:8181/api/user`
   - `http://localhost:8082/api/product`
   - `http://localhost:8083/api/order`
 
-## Rebuild complet depuis zero
+## Arret / destruction propre
+
+Arret et suppression des stacks:
+```bash
+cd /root/Zabbix
+./scripts/destroy.sh
+```
+
+Arret + suppression des volumes (reset base Zabbix):
+```bash
+./scripts/destroy.sh --purge-data
+```
+
+Arret + suppression des volumes + images locales:
+```bash
+./scripts/destroy.sh --purge-data --purge-images
+```
+
+## Rebuild complet
 
 ```bash
-# Stop stacks
-cd /root/Zabbix/App/microservice_python && docker compose -f monitoring-compose.yml down
-cd /root/Zabbix/Agent-Zabbix && docker compose -f docker-compose.yaml down
-cd /root/Zabbix/Zabbix && docker compose -f docker-compose.yaml down
-
-# (optionnel) supprimer volumes/containers a la main si reset total voulu
-
-# Recreate
 cd /root/Zabbix
+./scripts/destroy.sh --purge-data --purge-images
 ./scripts/bootstrap.sh
 ```
+
+## Documentation detaillee
+
+- Architecture reseau: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Explications par dossier: README present dans chaque repertoire du projet
+- Scripts: [scripts/README.md](scripts/README.md)

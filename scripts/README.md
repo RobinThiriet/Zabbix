@@ -1,19 +1,35 @@
 # scripts
 
-Scripts d'automatisation pour deploiement et configuration Zabbix.
+Scripts d'automatisation pour deploiement et exploitation du lab Zabbix.
 
 ## Fichiers
 
-- `bootstrap.sh`: deploie l'ensemble des stacks dans le bon ordre:
-  1. core Zabbix
-  2. actions d'auto-registration
-  3. agents autoscale
-  4. stack applicative 3 machines
-- `configure_autoregistration.sh`: configure via API Zabbix les actions d'auto-registration (metadata `agent`, `webapi-linux`, `autoscale-linux`).
+- `bootstrap.sh`: lance toute la plateforme dans le bon ordre.
+- `configure_autoregistration.sh`: configure via API les actions d'auto-registration.
+- `destroy.sh`: arrete et supprime proprement toutes les stacks.
 
-## Usage
+## Utilisation
 
+Lancement complet:
 ```bash
 cd /root/Zabbix
 ./scripts/bootstrap.sh
+```
+
+Arret/suppression propre:
+```bash
+cd /root/Zabbix
+./scripts/destroy.sh
+```
+
+Arret + suppression des volumes (reset data):
+```bash
+cd /root/Zabbix
+./scripts/destroy.sh --purge-data
+```
+
+Arret + suppression des volumes + images locales:
+```bash
+cd /root/Zabbix
+./scripts/destroy.sh --purge-data --purge-images
 ```
