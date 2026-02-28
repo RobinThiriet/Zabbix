@@ -8,10 +8,14 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$ROOT_DIR/.env"
 
 if [[ -f "$ENV_FILE" ]]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
+  # Load dotenv without shell-evaluating values (supports spaces after "=").
+  while IFS='=' read -r key value; do
+    [[ -z "${key// }" ]] && continue
+    [[ "$key" =~ ^[[:space:]]*# ]] && continue
+    if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      export "$key=$value"
+    fi
+  done < "$ENV_FILE"
   ZBX_URL="${ZBX_URL:-${ZABBIX_API_URL:-http://localhost:${ZABBIX_WEB_PORT:-8080}/api_jsonrpc.php}}"
   ZBX_USER="${ZBX_USER:-${ZABBIX_ADMIN_USER:-Admin}}"
   ZBX_PASS="${ZBX_PASS:-${ZABBIX_ADMIN_PASSWORD:-zabbix}}"
