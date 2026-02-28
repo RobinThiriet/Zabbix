@@ -1,8 +1,8 @@
 # Compte rendu - Supervision Zabbix
 
 ## Objectif pedagogique
-- Configurer et utiliser des outils de supervision pour surveiller la performance, l'etat et la securite des systemes informatiques et des infrastructures reseau. (C3.2.1, C5.2.1)
-- Concevoir et mettre en oeuvre des tableaux de bord personnalises pour le suivi en temps reel des indicateurs cles. (C5.4.1, C3.2.1)
+- Configurer et utiliser des outils de supervision pour surveiller la performance, l'etat et la securite des systemes informatiques et des infrastructures reseau.
+- Concevoir et mettre en oeuvre des tableaux de bord personnalises pour le suivi en temps reel des indicateurs cles. 
 
 ## Realisation
 
