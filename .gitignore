@@ -1,3 +1,16 @@
+# Environment
 .env
-data/
+
+# Runtime/logs
 *.log
+*.pid
+
+# Python
+__pycache__/
+*.pyc
+
+# WSL/Windows ADS artifacts
+*:Zone.Identifier
+
+# Local persistent Docker data (if any)
+data/

@@ -1,0 +1,15 @@
+services:
+  zbx-agent-autoscale:
+    image: zabbix/zabbix-agent2:alpine-latest
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_ACTIVE: zabbix-server
+      ZBX_HOSTNAMEITEM: system.hostname
+      ZBX_METADATA: autoscale-linux
+    restart: unless-stopped
+    networks:
+      - zabbix_default
+
+networks:
+  zabbix_default:
+    external: true

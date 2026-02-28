@@ -1,208 +1,122 @@
-# Zabbix Auto-Registration Stack
+# Plateforme de supervision Zabbix (reproductible)
 
-Stack Docker complète pour déployer Zabbix, connecter des agents, et valider un auto-enregistrement fiable basé sur la metadata (`host metadata`).
+Ce depot permet de reconstruire a l'identique une plateforme de supervision basee sur Zabbix avec:
 
-## Objectifs
+- `Zabbix Server + Web + PostgreSQL` dans `/root/Zabbix/Zabbix`
+- `Anciens agents autoscale` dans `/root/Zabbix/Agent-Zabbix`
+- `3 machines applicatives` (web + API REST Python + agent Zabbix) dans `/root/Zabbix/App/microservice_python`
 
-- Déployer rapidement un environnement Zabbix opérationnel.
-- Ajouter des agents Docker autonomes (`agent-1..4`).
-- Auto-créer les hôtes côté Zabbix via `Autoregistration actions`.
-- Éviter les erreurs courantes observées en lab:
-  - `host [agent-x] not found`
-  - interfaces cassées après changement d'IP Docker
-  - metadata non transmise
+L'objectif est de pouvoir supprimer l'environnement local puis le recreer rapidement depuis GitHub.
 
-## Architecture
+## Arborescence
 
-```mermaid
-flowchart LR
-  subgraph Core[Core stack - docker-compose.core.yaml]
-    PG[(PostgreSQL\nzbx-postgres)]
-    ZS[Zabbix Server\nzbx-server:10051]
-    ZW[Zabbix Web\nzbx-web:8080]
-    ZA0[Local Agent\nzbx-agent:10050]
-  end
-
-  subgraph Agents[Agents stack - docker-compose.agents.yaml]
-    A1[agent-1\nZBX_METADATA=agent]
-    A2[agent-2\nZBX_METADATA=agent]
-    A3[agent-3\nZBX_METADATA=agent]
-    A4[agent-4\nZBX_METADATA=agent]
-  end
-
-  Admin[Admin Browser\nhttp://localhost:8080]
-
-  Admin --> ZW
-  ZW --> ZS
-  ZS --> PG
-
-  A1 -->|Active checks 10051| ZS
-  A2 -->|Active checks 10051| ZS
-  A3 -->|Active checks 10051| ZS
-  A4 -->|Active checks 10051| ZS
-
-  ZS -->|Passive checks 10050| A1
-  ZS -->|Passive checks 10050| A2
-  ZS -->|Passive checks 10050| A3
-  ZS -->|Passive checks 10050| A4
-  ZS -->|Passive checks 10050| ZA0
+```text
+.
+├── Zabbix/
+│   └── docker-compose.yaml
+├── Agent-Zabbix/
+│   └── docker-compose.yaml
+├── App/
+│   └── microservice_python/
+│       ├── monitoring-compose.yml
+│       ├── docker-compose.yml
+│       ├── microservice_user/
+│       ├── microservice_product/
+│       ├── microservice_order/
+│       └── nginx/
+├── docs/
+│   └── ARCHITECTURE.md
+└── scripts/
+    ├── bootstrap.sh
+    └── configure_autoregistration.sh
 ```
 
-## Structure du projet
+## Architecture reseau
 
-- `docker-compose.core.yaml`: Postgres + Zabbix Server + Zabbix Web + agent local (`Zabbix server`).
-- `docker-compose.agents.yaml`: agents `agent-1..4` sur le réseau `zabbix_default`.
-- `.env.example`: variables de base de la stack.
-- `.gitignore`: exclusion `.env` + `data/`.
+Voir le detail dans [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Prérequis
+Resume:
+- Reseau `zabbix_default`: coeur Zabbix + agents
+- Reseau `lab`: web/api des 3 machines
+- Exposition web machines:
+  - machine-1: `8181`
+  - machine-2: `8082`
+  - machine-3: `8083`
+- Interface Zabbix: `8080`
 
-- Docker Engine + Docker Compose plugin.
-- Ports libres sur la machine hôte:
-  - `8080` (UI Zabbix)
-  - `10051` (trapper/server)
-  - `10050` (agent local exposé)
+## Prerequis
 
-## Déploiement
+- Docker + plugin Docker Compose
+- Ports disponibles: `8080`, `10050`, `10051`, `8181`, `8082`, `8083`
 
-### 1) Préparer l'environnement
+## Deploiement rapide (recommande)
 
 ```bash
-cp .env.example .env
+cd /root/Zabbix
+./scripts/bootstrap.sh
 ```
 
-### 2) Démarrer le coeur Zabbix
+Ce script:
+1. demarre Zabbix
+2. configure les actions d'auto-registration via API
+3. demarre les agents autoscale
+4. demarre les 3 machines (web + API + agent)
+
+## Deploiement manuel
 
 ```bash
-docker compose -f docker-compose.core.yaml up -d
+# 1) Coeur Zabbix
+cd /root/Zabbix/Zabbix
+docker compose -f docker-compose.yaml up -d
+
+# 2) Actions auto-registration
+cd /root/Zabbix
+./scripts/configure_autoregistration.sh
+
+# 3) Agents autoscale
+cd /root/Zabbix/Agent-Zabbix
+docker compose -f docker-compose.yaml up -d --scale zbx-agent-autoscale=4
+
+# 4) Stack 3 machines
+cd /root/Zabbix/App/microservice_python
+docker compose -f monitoring-compose.yml up -d --build
 ```
 
-### 3) Démarrer les agents
+## Verification
+
+- Zabbix UI: `http://localhost:8080` (`Admin` / `zabbix`)
+- Hosts attendus: `machine-1`, `machine-2`, `machine-3`, `agent-*`
+- Endpoints applicatifs:
+  - `http://localhost:8181/api/user`
+  - `http://localhost:8082/api/product`
+  - `http://localhost:8083/api/order`
+
+## Rebuild complet depuis zero
 
 ```bash
-docker compose -f docker-compose.agents.yaml up -d
+# Stop stacks
+cd /root/Zabbix/App/microservice_python && docker compose -f monitoring-compose.yml down
+cd /root/Zabbix/Agent-Zabbix && docker compose -f docker-compose.yaml down
+cd /root/Zabbix/Zabbix && docker compose -f docker-compose.yaml down
+
+# (optionnel) supprimer volumes/containers a la main si reset total voulu
+
+# Recreate
+cd /root/Zabbix
+./scripts/bootstrap.sh
 ```
 
-## Configuration Zabbix (obligatoire)
+## Zone.Identifier (explication)
 
-Menu: `Alerts > Actions > Autoregistration actions`
+Les fichiers `*:Zone.Identifier` ne sont pas du code du projet.
 
-Créer (ou éditer) l'action `auto-enrollement` avec:
+Ce sont des metadonnees Windows (Mark-of-the-Web) creees quand des fichiers viennent de Windows/Internet vers WSL. Ils peuvent apparaitre comme de "faux" fichiers sous Linux. Ils sont sans utilite pour l'execution Docker/Python/Zabbix.
 
-- Condition:
-  - `Host metadata contains agent`
-- Operations:
-  - `Add host`
-  - `Add to host groups: Linux servers`
-  - `Link templates: Linux by Zabbix agent`
-  - `Enable host`
+Actions prises:
+- nettoyage de ces fichiers dans le projet
+- ajout d'une regle `.gitignore` pour eviter leur retour
 
-## Paramètres agents importants
+## Notes d'exploitation
 
-Dans `docker-compose.agents.yaml`:
-
-- `ZBX_HOSTNAME`: doit être unique (`agent-1`, `agent-2`, ...).
-- `ZBX_METADATA`: **clé correcte** utilisée par l'image `zabbix/zabbix-agent2`.
-- `ZBX_SERVER_HOST` / `ZBX_SERVER_ACTIVE`: `zabbix-server`.
-
-## Vérifications opérationnelles
-
-### Vérifier les conteneurs
-
-```bash
-docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
-```
-
-### Vérifier les logs serveur
-
-```bash
-docker logs --tail 200 zbx-server
-```
-
-Signes de bon fonctionnement:
-- disparition de `host [agent-x] not found`
-- apparition des hosts `agent-1..4` dans l'UI
-
-### Vérifier les logs agents
-
-```bash
-docker logs --tail 120 zbx-agent-1
-```
-
-Signe attendu:
-- `active checks on server are active again`
-
-## Gestion des interfaces (important)
-
-Dans Zabbix, pour les hosts auto-créés, privilégier:
-
-- `Connect to: DNS`
-- DNS = nom de conteneur (`zbx-agent-1`, etc.)
-- Port = `10050`
-
-Pourquoi: les IP Docker changent après `down/up`, le DNS de service reste stable.
-
-## Dépannage rapide
-
-### Problème: `host [agent-x] not found`
-
-Causes probables:
-- action d'auto-registration absente/désactivée
-- condition metadata ne matche pas
-- agent n'envoie pas la bonne metadata
-
-Contrôles:
-- action `Enabled`
-- condition `Host metadata contains agent`
-- compose agents: `ZBX_METADATA: agent`
-
-### Problème: agent rouge / `Connection refused`
-
-Cause probable:
-- interface Zabbix sur mauvaise IP après redémarrage Docker
-
-Correction:
-- passer l'interface host en mode DNS
-- renseigner le nom de service Docker
-
-### Problème: rien n'apparait après suppression manuelle des hosts
-
-Procédure:
-1. Vérifier l'action d'auto-registration.
-2. Redémarrer les agents:
-   ```bash
-   docker compose -f docker-compose.agents.yaml up -d --force-recreate
-   ```
-3. Surveiller les logs `zbx-server` pendant 1 à 2 cycles.
-
-## Commandes utiles
-
-### Redémarrer seulement les agents
-
-```bash
-docker compose -f docker-compose.agents.yaml up -d --force-recreate
-```
-
-### Stopper les agents
-
-```bash
-docker compose -f docker-compose.agents.yaml down
-```
-
-### Stopper toute la stack
-
-```bash
-docker compose -f docker-compose.agents.yaml down
-docker compose -f docker-compose.core.yaml down
-```
-
-## Sécurité / bonnes pratiques
-
-- Ne pas commiter `.env` ni `data/`.
-- Changer les mots de passe par défaut avant usage non-lab.
-- Restreindre les ports exposés en environnement partagé.
-- Versionner les actions Zabbix via runbook interne (ou API) pour reproductibilité.
-
-## Licence
-
-Usage interne lab / POC.
+- `Dockerhand` a ete nettoye pour ne conserver que `/root/Dockerhand/docker-compose.yaml`.
+- Le depot Git est centralise dans: `/root/Zabbix`.
