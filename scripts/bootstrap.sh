@@ -2,14 +2,22 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="$ROOT_DIR/.env"
 
 # Deployment targets inside this repository
 ZBX_DIR="$ROOT_DIR/Zabbix"
 AGENT_DIR="$ROOT_DIR/Agent-Zabbix"
 APP_DIR="$ROOT_DIR/App/microservice_python"
 
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "ERROR: missing $ENV_FILE"
+  echo "Create it from .env.example:"
+  echo "  cp $ROOT_DIR/.env.example $ENV_FILE"
+  exit 1
+fi
+
 echo "[1/5] Starting Zabbix core stack..."
-docker compose -f "$ZBX_DIR/docker-compose.yaml" up -d
+docker compose --env-file "$ENV_FILE" -f "$ZBX_DIR/docker-compose.yaml" up -d
 
 echo "[2/5] Waiting for Zabbix API..."
 for _ in {1..60}; do
@@ -23,10 +31,10 @@ echo "[3/5] Configuring auto-registration actions..."
 "$ROOT_DIR/scripts/configure_autoregistration.sh"
 
 echo "[4/5] Starting autoscale agents..."
-docker compose -f "$AGENT_DIR/docker-compose.yaml" up -d --scale zbx-agent-autoscale=4
+docker compose --env-file "$ENV_FILE" -f "$AGENT_DIR/docker-compose.yaml" up -d --scale zbx-agent-autoscale=4
 
 echo "[5/5] Starting application monitoring stack (3 machines)..."
-docker compose -f "$APP_DIR/monitoring-compose.yml" up -d --build
+docker compose --env-file "$ENV_FILE" -f "$APP_DIR/monitoring-compose.yml" up -d --build
 
 echo "Deployment complete."
 echo "Zabbix UI: http://localhost:8080 (Admin / zabbix)"

@@ -3,25 +3,22 @@ services:
     build:
       context: ./microservice_order
       dockerfile: Dockerfile
-    container_name: order-service
     ports:
-      - "5001:5000"
+      - "${ORDER_SERVICE_PORT:-5001}:5000"
     restart: unless-stopped
 
   product_service:
     build:
       context: ./microservice_product
       dockerfile: Dockerfile
-    container_name: product-service
     ports:
-      - "5002:5000"
+      - "${PRODUCT_SERVICE_PORT:-5002}:5000"
     restart: unless-stopped
 
   user_service:
     build:
       context: ./microservice_user
       dockerfile: Dockerfile
-    container_name: user-service
     ports:
-      - "5003:5000"
+      - "${USER_SERVICE_PORT:-5003}:5000"
     restart: unless-stopped

@@ -1,152 +1,116 @@
 # Zabbix Supervision Lab
 
-Plateforme de supervision complete et reproductible basee sur Zabbix, structuree pour etre recreee a la demande depuis GitHub.
+Plateforme de supervision Docker, clonable et reconfigurable via un seul fichier `.env`.
 
-## Objectif
+## Ce que fournit le projet
 
-Ce projet fournit un environnement prêt pour:
-- supervision infrastructure (Zabbix Server, agents Linux)
-- supervision applicative (3 machines logiques web + API REST Python)
-- auto-registration des hotes via metadata
-- deploiement et destruction automatises
+- stack coeur Zabbix: PostgreSQL + Zabbix Server + Web + agent local
+- stack agents autoscale (auto-registration)
+- stack applicative 3 machines logiques (`web + api + agent`) pour la supervision applicative
+- scripts d'exploitation: lancement complet, configuration auto-registration, destruction propre
 
-## Architecture du projet
+## Capture monitoring
 
-```text
-/root/Zabbix
-├── Zabbix/                # stack coeur (DB + server + web + agent local)
-├── Agent-Zabbix/          # stack agents autoscale
-├── App/microservice_python/ # stack applicative 3 machines + agents
-├── docs/                  # documentation architecture
-└── scripts/               # bootstrap, autoreg, destroy
-```
+![Monitoring overview](docs/images/monitoring-overview.svg)
 
-## Schema d'architecture
+## Architecture
 
 ```mermaid
 flowchart TB
-  User[Admin Browser\nhttp://localhost:8080] --> ZW
+  User[Admin Browser\nhttp://localhost:${ZABBIX_WEB_PORT}] --> ZW
 
   subgraph Core[Core Zabbix Stack]
     PG[(PostgreSQL)]
-    ZS[Zabbix Server\n:10051]
-    ZW[Zabbix Web\n:8080]
-    ZA0[Local Agent\n:10050]
+    ZS[Zabbix Server\n:${ZABBIX_SERVER_PORT}]
+    ZW[Zabbix Web]
+    ZA0[Local Agent\n:${ZABBIX_AGENT_PORT}]
     ZW --> ZS
     ZS --> PG
     ZS --> ZA0
   end
 
-  subgraph Agents[Autoscale Agents Stack]
-    AA1[zbx-agent-autoscale-1]
-    AA2[zbx-agent-autoscale-2]
-    AA3[zbx-agent-autoscale-3]
-    AA4[zbx-agent-autoscale-4]
-  end
-
-  subgraph Apps[Application Monitoring Stack]
+  subgraph AppStack[Application Monitoring Stack]
     subgraph M1[Machine 1]
-      N1[machine-1]
-      W1[web-machine-1\n:8181]
-      A1[api-machine-1]
+      W1[web-machine-1\n:${APP_MACHINE1_WEB_PORT}] --> A1[api-machine-1]
       AG1[zbx-agent-machine-1]
-      N1 --> W1
-      N1 --> AG1
-      W1 -->|/api| A1
     end
-
     subgraph M2[Machine 2]
-      N2[machine-2]
-      W2[web-machine-2\n:8082]
-      A2[api-machine-2]
+      W2[web-machine-2\n:${APP_MACHINE2_WEB_PORT}] --> A2[api-machine-2]
       AG2[zbx-agent-machine-2]
-      N2 --> W2
-      N2 --> AG2
-      W2 -->|/api| A2
     end
-
     subgraph M3[Machine 3]
-      N3[machine-3]
-      W3[web-machine-3\n:8083]
-      A3[api-machine-3]
+      W3[web-machine-3\n:${APP_MACHINE3_WEB_PORT}] --> A3[api-machine-3]
       AG3[zbx-agent-machine-3]
-      N3 --> W3
-      N3 --> AG3
-      W3 -->|/api| A3
     end
   end
 
   AG1 -->|active checks| ZS
   AG2 -->|active checks| ZS
   AG3 -->|active checks| ZS
-
-  AA1 -->|active checks| ZS
-  AA2 -->|active checks| ZS
-  AA3 -->|active checks| ZS
-  AA4 -->|active checks| ZS
 ```
 
-## Composants
+## Arborescence
 
-- `Zabbix/docker-compose.yaml`
-  - PostgreSQL
-  - Zabbix Server
-  - Zabbix Web
-  - Agent local
-- `Agent-Zabbix/docker-compose.yaml`
-  - Agent autoscale (scalable via `--scale`)
-- `App/microservice_python/monitoring-compose.yml`
-  - 3 APIs Flask
-  - 3 frontaux Nginx
-  - 3 agents Zabbix dedies
+```text
+/root/Zabbix
+├── .env.example
+├── Zabbix/
+│   └── docker-compose.yaml
+├── Agent-Zabbix/
+│   └── docker-compose.yaml
+├── App/microservice_python/
+│   ├── monitoring-compose.yml
+│   ├── docker-compose.yml
+│   ├── microservice_user/
+│   ├── microservice_product/
+│   ├── microservice_order/
+│   └── nginx/
+├── scripts/
+│   ├── bootstrap.sh
+│   ├── configure_autoregistration.sh
+│   └── destroy.sh
+└── docs/
+    ├── ARCHITECTURE.md
+    ├── COMPONENTS.md
+    ├── RUNBOOK.md
+    └── images/
+```
 
-## Prerequis
+## Configuration centralisee (`.env`)
 
-- Docker Engine + Docker Compose plugin
-- Ports libres: `8080`, `10050`, `10051`, `8181`, `8082`, `8083`
+Ce projet est concu pour eviter les valeurs hardcodees (ports, metadata, secrets, etc.).
 
-## Deploiement rapide
+1. Creer le fichier local:
+```bash
+cd /root/Zabbix
+cp .env.example .env
+```
+2. Modifier les variables selon ta machine (ports deja utilises, mot de passe DB, etc.).
+
+Variables principales:
+- `POSTGRES_PASSWORD`
+- `ZABBIX_WEB_PORT`
+- `ZABBIX_SERVER_PORT`
+- `ZABBIX_AGENT_PORT`
+- `APP_MACHINE1_WEB_PORT`, `APP_MACHINE2_WEB_PORT`, `APP_MACHINE3_WEB_PORT`
+
+## Lancement complet
 
 ```bash
 cd /root/Zabbix
 ./scripts/bootstrap.sh
 ```
 
-Ce script:
-1. lance le core Zabbix
-2. configure les actions d'auto-registration via API
-3. lance les agents autoscale
-4. lance la stack applicative 3 machines
+## Destruction propre
 
-## Verification
-
-- UI Zabbix: `http://localhost:8080` (`Admin` / `zabbix`)
-- Endpoints web:
-  - `http://localhost:8181`
-  - `http://localhost:8082`
-  - `http://localhost:8083`
-- Endpoints API:
-  - `http://localhost:8181/api/user`
-  - `http://localhost:8082/api/product`
-  - `http://localhost:8083/api/order`
-
-## Arret / destruction propre
-
-Arret et suppression des stacks:
 ```bash
 cd /root/Zabbix
 ./scripts/destroy.sh
 ```
 
-Arret + suppression des volumes (reset base Zabbix):
-```bash
-./scripts/destroy.sh --purge-data
-```
-
-Arret + suppression des volumes + images locales:
-```bash
-./scripts/destroy.sh --purge-data --purge-images
-```
+Options:
+- reset data (volumes): `./scripts/destroy.sh --purge-data`
+- reset data + images locales: `./scripts/destroy.sh --purge-data --purge-images`
 
 ## Rebuild complet
 
@@ -158,6 +122,6 @@ cd /root/Zabbix
 
 ## Documentation detaillee
 
-- Architecture reseau: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- Explications par dossier: README present dans chaque repertoire du projet
-- Scripts: [scripts/README.md](scripts/README.md)
+- architecture reseau: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- description de tous les fichiers: [docs/COMPONENTS.md](docs/COMPONENTS.md)
+- procedures d'exploitation: [docs/RUNBOOK.md](docs/RUNBOOK.md)

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="$ROOT_DIR/.env"
 ZBX_DIR="$ROOT_DIR/Zabbix"
 AGENT_DIR="$ROOT_DIR/Agent-Zabbix"
 APP_DIR="$ROOT_DIR/App/microservice_python"
@@ -22,6 +23,13 @@ Options:
 USAGE
 }
 
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "ERROR: missing $ENV_FILE"
+  echo "Create it from .env.example:"
+  echo "  cp $ROOT_DIR/.env.example $ENV_FILE"
+  exit 1
+fi
+
 for arg in "$@"; do
   case "$arg" in
     --purge-data) PURGE_DATA=true ;;
@@ -41,10 +49,10 @@ down_compose() {
 
   if [[ "$PURGE_DATA" == true ]]; then
     echo "- Stopping $desc (with volumes)..."
-    docker compose -f "$compose_file" down --remove-orphans --volumes
+    docker compose --env-file "$ENV_FILE" -f "$compose_file" down --remove-orphans --volumes
   else
     echo "- Stopping $desc..."
-    docker compose -f "$compose_file" down --remove-orphans
+    docker compose --env-file "$ENV_FILE" -f "$compose_file" down --remove-orphans
   fi
 }
 

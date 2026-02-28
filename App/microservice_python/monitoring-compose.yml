@@ -3,36 +3,33 @@ services:
     build:
       context: ./microservice_user
       dockerfile: Dockerfile
-    container_name: api-machine-1
     restart: unless-stopped
     networks:
       - lab
 
   web-machine-1:
     image: nginx:1.27-alpine
-    container_name: web-machine-1
     depends_on:
       - api-machine-1
     volumes:
       - ./nginx/machine1/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/machine1/index.html:/usr/share/nginx/html/index.html:ro
     ports:
-      - "8181:80"
+      - "${APP_MACHINE1_WEB_PORT:-8181}:80"
     restart: unless-stopped
     networks:
       - lab
 
   zbx-agent-machine-1:
     image: zabbix/zabbix-agent2:alpine-latest
-    container_name: zbx-agent-machine-1
     depends_on:
       - web-machine-1
       - api-machine-1
     environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_SERVER_ACTIVE: zabbix-server
-      ZBX_HOSTNAME: machine-1
-      ZBX_METADATA: webapi-linux
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: ${MACHINE1_HOSTNAME:-machine-1}
+      ZBX_METADATA: ${ZBX_METADATA_WEBAPI:-webapi-linux}
     restart: unless-stopped
     networks:
       - lab
@@ -42,36 +39,33 @@ services:
     build:
       context: ./microservice_product
       dockerfile: Dockerfile
-    container_name: api-machine-2
     restart: unless-stopped
     networks:
       - lab
 
   web-machine-2:
     image: nginx:1.27-alpine
-    container_name: web-machine-2
     depends_on:
       - api-machine-2
     volumes:
       - ./nginx/machine2/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/machine2/index.html:/usr/share/nginx/html/index.html:ro
     ports:
-      - "8082:80"
+      - "${APP_MACHINE2_WEB_PORT:-8082}:80"
     restart: unless-stopped
     networks:
       - lab
 
   zbx-agent-machine-2:
     image: zabbix/zabbix-agent2:alpine-latest
-    container_name: zbx-agent-machine-2
     depends_on:
       - web-machine-2
       - api-machine-2
     environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_SERVER_ACTIVE: zabbix-server
-      ZBX_HOSTNAME: machine-2
-      ZBX_METADATA: webapi-linux
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: ${MACHINE2_HOSTNAME:-machine-2}
+      ZBX_METADATA: ${ZBX_METADATA_WEBAPI:-webapi-linux}
     restart: unless-stopped
     networks:
       - lab
@@ -81,36 +75,33 @@ services:
     build:
       context: ./microservice_order
       dockerfile: Dockerfile
-    container_name: api-machine-3
     restart: unless-stopped
     networks:
       - lab
 
   web-machine-3:
     image: nginx:1.27-alpine
-    container_name: web-machine-3
     depends_on:
       - api-machine-3
     volumes:
       - ./nginx/machine3/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/machine3/index.html:/usr/share/nginx/html/index.html:ro
     ports:
-      - "8083:80"
+      - "${APP_MACHINE3_WEB_PORT:-8083}:80"
     restart: unless-stopped
     networks:
       - lab
 
   zbx-agent-machine-3:
     image: zabbix/zabbix-agent2:alpine-latest
-    container_name: zbx-agent-machine-3
     depends_on:
       - web-machine-3
       - api-machine-3
     environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_SERVER_ACTIVE: zabbix-server
-      ZBX_HOSTNAME: machine-3
-      ZBX_METADATA: webapi-linux
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: ${MACHINE3_HOSTNAME:-machine-3}
+      ZBX_METADATA: ${ZBX_METADATA_WEBAPI:-webapi-linux}
     restart: unless-stopped
     networks:
       - lab
@@ -119,10 +110,10 @@ services:
   zbx-agent-autoscale:
     image: zabbix/zabbix-agent2:alpine-latest
     environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_SERVER_ACTIVE: zabbix-server
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
       ZBX_HOSTNAMEITEM: system.hostname
-      ZBX_METADATA: autoscale-linux
+      ZBX_METADATA: ${ZBX_METADATA_AUTOSCALE:-autoscale-linux}
     restart: unless-stopped
     networks:
       - zabbix_default
