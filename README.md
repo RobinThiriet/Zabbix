@@ -105,18 +105,3 @@ cd /root/Zabbix/Zabbix && docker compose -f docker-compose.yaml down
 cd /root/Zabbix
 ./scripts/bootstrap.sh
 ```
-
-## Zone.Identifier (explication)
-
-Les fichiers `*:Zone.Identifier` ne sont pas du code du projet.
-
-Ce sont des metadonnees Windows (Mark-of-the-Web) creees quand des fichiers viennent de Windows/Internet vers WSL. Ils peuvent apparaitre comme de "faux" fichiers sous Linux. Ils sont sans utilite pour l'execution Docker/Python/Zabbix.
-
-Actions prises:
-- nettoyage de ces fichiers dans le projet
-- ajout d'une regle `.gitignore` pour eviter leur retour
-
-## Notes d'exploitation
-
-- `Dockerhand` a ete nettoye pour ne conserver que `/root/Dockerhand/docker-compose.yaml`.
-- Le depot Git est centralise dans: `/root/Zabbix`.
