@@ -51,6 +51,16 @@ flowchart TB
   AGF4 --> ZS
 ```
 
+## Captures d'ecran
+
+### Vue Zabbix - Hosts
+
+![Zabbix Hosts](docs/images/zabbix-hosts.png)
+
+### Vue Docker - Conteneurs en execution
+
+![Docker Containers](docs/images/docker-containers.png)
+
 ## Prerequis
 
 ```bash
