@@ -1,55 +1,58 @@
-# Runbook
+# RUNBOOK
 
-## 1) Initialisation
+## Initialisation
 
 ```bash
 cd /root/Zabbix
 cp .env.example .env
 ```
 
-Renseigner au minimum:
-- `POSTGRES_PASSWORD`
-- ports si conflit local (`ZABBIX_WEB_PORT`, `APP_MACHINE*_WEB_PORT`, etc.)
-- `ENABLE_AUTOSCALE_STACK=false` (recommande pour un environnement lisible)
-
-## 2) Deploiement complet
+## C1 - Zabbix Server/Web/DB
 
 ```bash
-cd /root/Zabbix
-./scripts/bootstrap.sh
+./scripts/scenario_c1.sh
 ```
 
-Par defaut, seuls `machine-1`, `machine-2`, `machine-3` sont provisionnes.
-Pour lancer aussi les anciens agents autoscale:
-1. passer `ENABLE_AUTOSCALE_STACK=true` dans `.env`
-2. relancer `./scripts/bootstrap.sh`
+Validation:
+- UI: `http://localhost:${ZABBIX_WEB_PORT}`
+- host `Zabbix server` en vert
 
-## 3) Verification rapide
-
-- UI Zabbix: `http://localhost:${ZABBIX_WEB_PORT}`
-- Hosts attendus: `machine-1`, `machine-2`, `machine-3`, `agent-*`
-- Endpoints:
-  - `http://localhost:${APP_MACHINE1_WEB_PORT}`
-  - `http://localhost:${APP_MACHINE2_WEB_PORT}`
-  - `http://localhost:${APP_MACHINE3_WEB_PORT}`
-
-## 4) Arret/suppression propre
+## C2 - Machine vierge (auto-discovery/template)
 
 ```bash
-cd /root/Zabbix
-./scripts/destroy.sh
+./scripts/scenario_c2.sh
 ```
 
-### Reset complet (data + images)
+Validation:
+- hosts `agent-1`, `agent-2`, `agent-3`, `agent-4`
+- template Linux lie automatiquement
+
+## C3 - 3 machines web+api+agent
 
 ```bash
-./scripts/destroy.sh --purge-data --purge-images
+./scripts/scenario_c3.sh
 ```
 
-## 5) Rebuild from scratch
+Validation:
+- hosts `machine-1`, `machine-2`, `machine-3`
+- endpoints:
+  - `http://localhost:${APP_MACHINE1_WEB_PORT}/api/user`
+  - `http://localhost:${APP_MACHINE2_WEB_PORT}/api/product`
+  - `http://localhost:${APP_MACHINE3_WEB_PORT}/api/order`
+
+## Nettoyage hôtes techniques
 
 ```bash
-cd /root/Zabbix
-./scripts/destroy.sh --purge-data --purge-images
-./scripts/bootstrap.sh
+./scripts/cleanup_stale_hosts.sh --apply
+```
+
+## Reset global
+
+```bash
+./scripts/scenario_reset.sh
+```
+
+Reset complet:
+```bash
+./scripts/scenario_reset.sh --purge-data --purge-images
 ```

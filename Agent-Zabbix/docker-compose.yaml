@@ -1,11 +1,44 @@
 services:
-  zbx-agent-autoscale:
+  zbx-agent-1:
     image: zabbix/zabbix-agent2:alpine-latest
     environment:
       ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
       ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
-      ZBX_HOSTNAMEITEM: system.hostname
-      ZBX_METADATA: ${ZBX_METADATA_AUTOSCALE:-autoscale-linux}
+      ZBX_HOSTNAME: agent-1
+      ZBX_METADATA: ${ZBX_METADATA_AGENT:-agent}
+    restart: unless-stopped
+    networks:
+      - zabbix_default
+
+  zbx-agent-2:
+    image: zabbix/zabbix-agent2:alpine-latest
+    environment:
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: agent-2
+      ZBX_METADATA: ${ZBX_METADATA_AGENT:-agent}
+    restart: unless-stopped
+    networks:
+      - zabbix_default
+
+  zbx-agent-3:
+    image: zabbix/zabbix-agent2:alpine-latest
+    environment:
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: agent-3
+      ZBX_METADATA: ${ZBX_METADATA_AGENT:-agent}
+    restart: unless-stopped
+    networks:
+      - zabbix_default
+
+  zbx-agent-4:
+    image: zabbix/zabbix-agent2:alpine-latest
+    environment:
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST:-zabbix-server}
+      ZBX_SERVER_ACTIVE: ${ZBX_SERVER_ACTIVE:-zabbix-server}
+      ZBX_HOSTNAME: agent-4
+      ZBX_METADATA: ${ZBX_METADATA_AGENT:-agent}
     restart: unless-stopped
     networks:
       - zabbix_default
