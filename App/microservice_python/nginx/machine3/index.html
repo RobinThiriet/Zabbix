@@ -110,6 +110,12 @@
         gap: 14px;
       }
 
+      code {
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.92rem;
+        color: #d7dcff;
+      }
+
       .banner {
         display: inline-block;
         padding: 10px 14px;
@@ -138,39 +144,48 @@
       <section class="hero">
         <div>
           <span class="tag">Machine 3</span>
-          <h1>Presence web claire, design propre, statut immediat.</h1>
+          <h1>Order workflow online, commandes disponibles.</h1>
           <p>
-            Page d'accueil professionnelle pour la machine 3, avec une lecture
-            directe du service expose et une presentation homogene sur les trois noeuds.
+            Front applicatif du microservice commande. Cette machine permet de
+            consulter et creer des commandes via le proxy Nginx publie sur le
+            port 8083.
           </p>
           <div class="grid">
             <article class="card">
-              <span class="label">Etat</span>
-              <strong class="value">Online</strong>
+              <span class="label">Microservice</span>
+              <strong class="value">Order Management</strong>
             </article>
             <article class="card">
-              <span class="label">Port public</span>
-              <strong class="value">8083</strong>
+              <span class="label">Endpoint</span>
+              <strong class="value">/api/order</strong>
             </article>
             <article class="card">
-              <span class="label">Service</span>
-              <strong class="value">web-machine-3</strong>
+              <span class="label">Methodes</span>
+              <strong class="value">GET POST</strong>
+            </article>
+            <article class="card">
+              <span class="label">Donnees</span>
+              <strong class="value">Liste de commandes</strong>
             </article>
           </div>
         </div>
         <aside class="side">
           <article class="card">
             <span class="banner">Service web disponible</span>
-            <h2>Lecture immediate</h2>
-            <p>La machine 3 confirme l'accessibilite HTTP et reste facilement identifiable dans l'ensemble de la stack.</p>
+            <h2>Gestion des commandes</h2>
+            <p>Le frontal Nginx expose correctement l'API Flask pour le suivi et la creation des commandes metier.</p>
           </article>
           <article class="card">
-            <h2>Positionnement</h2>
-            <p>Rendu simple, plus institutionnel, adapte a une presentation de projet ou a une validation d'environnement.</p>
+            <h2>Exemple de requete</h2>
+            <p><code>GET http://localhost:8083/api/order</code> pour lister les commandes actuellement en memoire.</p>
+          </article>
+          <article class="card">
+            <h2>Exemple de payload</h2>
+            <p><code>{"id":"O-100","user_id":"U-1","product_id":"P-100"}</code> a envoyer en POST pour creer une commande.</p>
           </article>
         </aside>
       </section>
-      <div class="footer">Machine 3 | Nginx frontend | Port 8083 | Service web disponible</div>
+      <div class="footer">Machine 3 | Order management microservice | Proxy Nginx | Port 8083</div>
     </main>
   </body>
 </html>

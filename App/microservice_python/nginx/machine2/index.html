@@ -111,6 +111,12 @@
         gap: 14px;
       }
 
+      code {
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.92rem;
+        color: #ffe3c0;
+      }
+
       .footer {
         border-top: 1px solid var(--line);
         padding: 18px 36px 26px;
@@ -131,43 +137,48 @@
       <section class="hero">
         <div>
           <span class="tag">Machine 2</span>
-          <h1>Service web stable, exposition maitrisee.</h1>
+          <h1>Product catalog online, inventaire accessible.</h1>
           <p>
-            Interface de presence pour la machine 2, concue pour afficher un
-            statut clair, professionnel et directement exploitable dans ton lab.
+            Front applicatif du microservice produit. Cette machine sert la
+            consultation et l'ajout d'articles dans le catalogue via le proxy
+            Nginx expose en port 8082.
           </p>
           <div class="grid">
             <article class="card">
-              <span class="label">Etat</span>
-              <strong class="value">Healthy</strong>
+              <span class="label">Microservice</span>
+              <strong class="value">Product Catalog</strong>
             </article>
             <article class="card">
-              <span class="label">Port public</span>
-              <strong class="value">8082</strong>
+              <span class="label">Endpoint</span>
+              <strong class="value">/api/product</strong>
             </article>
             <article class="card">
-              <span class="label">Service</span>
-              <strong class="value">web-machine-2</strong>
+              <span class="label">Methodes</span>
+              <strong class="value">GET POST</strong>
             </article>
             <article class="card">
-              <span class="label">Rendu</span>
-              <strong class="value">Corporate Landing</strong>
+              <span class="label">Donnees</span>
+              <strong class="value">Liste de produits</strong>
             </article>
           </div>
         </div>
         <aside class="side">
           <article class="card">
             <span class="badge">HTTP 200</span>
-            <h2>Disponibilite visible</h2>
-            <p>La machine 2 confirme son acces web avec un ecran d'accueil sobre et exploitable en verification rapide.</p>
+            <h2>Catalogue disponible</h2>
+            <p>Le frontal redirige correctement vers l'API Flask pour lister les produits et enregistrer de nouvelles references.</p>
           </article>
           <article class="card">
-            <h2>Usage</h2>
-            <p>Convient pour recette, supervision visuelle, capture d'ecran ou demonstration d'architecture multi-machines.</p>
+            <h2>Exemple de requete</h2>
+            <p><code>GET http://localhost:8082/api/product</code> pour lire le catalogue expose par le microservice.</p>
+          </article>
+          <article class="card">
+            <h2>Exemple de payload</h2>
+            <p><code>{"id":"P-100","name":"Laptop","price":1299}</code> a envoyer en POST pour ajouter un produit.</p>
           </article>
         </aside>
       </section>
-      <div class="footer">Machine 2 | Nginx frontend | Port 8082 | Service web disponible</div>
+      <div class="footer">Machine 2 | Product catalog microservice | Proxy Nginx | Port 8082</div>
     </main>
   </body>
 </html>

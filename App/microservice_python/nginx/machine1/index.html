@@ -148,40 +148,40 @@
       <section class="hero">
         <div>
           <span class="tag">Machine 1</span>
-          <h1>Web front online, infrastructure prete.</h1>
+          <h1>User service online, acces utilisateur pret.</h1>
           <p>
-            Point d'entree Nginx de la machine 1. La page confirme que
-            l'exposition web fonctionne correctement sur le port 8081 avec un
-            rendu propre et lisible.
+            Point d'entree Nginx du microservice utilisateur. Cette machine
+            expose la gestion des utilisateurs et confirme que le service web
+            repond correctement sur le port 8081.
           </p>
           <div class="status-row">
             <article class="card">
-              <span class="label">Etat</span>
-              <strong class="value">Operational</strong>
+              <span class="label">Microservice</span>
+              <strong class="value">Users</strong>
             </article>
             <article class="card">
-              <span class="label">Port public</span>
-              <strong class="value">8081</strong>
+              <span class="label">Endpoint</span>
+              <strong class="value">/api/user</strong>
             </article>
             <article class="card">
-              <span class="label">Service</span>
-              <strong class="value">web-machine-1</strong>
+              <span class="label">Methodes</span>
+              <strong class="value">GET POST DELETE</strong>
             </article>
           </div>
         </div>
         <aside class="side">
           <article class="card">
             <div class="live">HTTP service available</div>
-            <h2>Validation immediate</h2>
-            <p>Cette machine repond correctement et peut etre utilisee pour la supervision et les demonstrations.</p>
+            <h2>Gestion des utilisateurs</h2>
+            <p>Ajout, lecture et suppression d'utilisateurs via le proxy Nginx en frontal du service Flask.</p>
           </article>
           <article class="card">
-            <h2>Stack</h2>
-            <p>Nginx, page statique embarquee, integration simple avec le reste de la stack Docker et Zabbix.</p>
+            <h2>URL utile</h2>
+            <p>Teste le service avec <code>http://localhost:8081/api/user</code> pour valider la chaine web + API.</p>
           </article>
         </aside>
       </section>
-      <div class="footer">Machine 1 | Nginx frontend | Port 8081 | Service web disponible</div>
+      <div class="footer">Machine 1 | User microservice | Proxy Nginx | Port 8081</div>
     </main>
   </body>
 </html>
