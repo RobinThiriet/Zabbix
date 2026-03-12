@@ -53,13 +53,15 @@ flowchart TB
 
 ## Captures d'ecran
 
-### Vue Zabbix - Hosts
+Le depot ne contient pas de captures PNG versionnees par defaut.
+Le visuel ci-dessous est present dans le repo et s'affiche correctement sur GitHub:
 
-![Zabbix Hosts](docs/images/zabbix-hosts.png)
+![Monitoring Overview](docs/images/monitoring-overview.svg)
 
-### Vue Docker - Conteneurs en execution
+Si tu veux ajouter de vraies captures d'ecran plus tard, place simplement dans `docs/images/`:
 
-![Docker Containers](docs/images/docker-containers.png)
+- `zabbix-hosts.png`
+- `docker-containers.png`
 
 ## Prerequis
 

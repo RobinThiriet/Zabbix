@@ -1,6 +1,8 @@
 # Images used in README
 
-Place your screenshots in this folder with these exact names:
+The README now uses `monitoring-overview.svg` by default to avoid broken images.
+
+If you want to replace the placeholder with real screenshots, place them in this folder with these exact names:
 
 - `zabbix-hosts.png`
 - `docker-containers.png`
