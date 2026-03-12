@@ -53,15 +53,48 @@ flowchart TB
 
 ## Captures d'ecran
 
-Le depot ne contient pas de captures PNG versionnees par defaut.
-Le visuel ci-dessous est present dans le repo et s'affiche correctement sur GitHub:
+### Vue globale Zabbix
 
-![Monitoring Overview](docs/images/monitoring-overview.svg)
+La supervision centralise l'ensemble des hotes du lab: `Zabbix server`, les agents `agent-1..4` et les trois machines applicatives `machine-1..3`.
 
-Si tu veux ajouter de vraies captures d'ecran plus tard, place simplement dans `docs/images/`:
+![Vue Zabbix Hosts](docs/images/hosts.png)
 
-- `zabbix-hosts.png`
-- `docker-containers.png`
+### Pages d'accueil des microservices
+
+Chaque machine expose une page d'accueil dediee a son role metier, servie par Nginx puis reliee a son API Flask en backend.
+
+#### Machine 1 - User Service
+
+![Machine 1 - User Service](docs/images/Machine1.png)
+
+#### Machine 2 - Product Catalog
+
+![Machine 2 - Product Catalog](docs/images/Machine2.png)
+
+#### Machine 3 - Order Management
+
+![Machine 3 - Order Management](docs/images/Machine3.png)
+
+## Analyse rapide
+
+Cette architecture montre une separation claire entre presentation, exposition web et logique metier:
+
+- `web-machine-*` sert l'interface statique et joue le role de reverse proxy via Nginx
+- `api-machine-*` expose la logique applicative Flask pour les utilisateurs, produits et commandes
+- `zbx-agent-machine-*` remonte l'etat de chaque machine vers Zabbix
+
+L'interet en contexte professionnel est double:
+
+- decoupler les responsabilites pour faire evoluer chaque service independamment
+- superviser separement les composants critiques pour detecter rapidement une indisponibilite
+
+Le lab simule ainsi un mini systeme d'entreprise type e-commerce ou portail interne:
+
+- `machine-1` gere les utilisateurs
+- `machine-2` gere le catalogue produit
+- `machine-3` gere les commandes
+
+L'ecran Zabbix confirme que l'ensemble des hotes est bien enregistre, disponible et remonte ses donnees de supervision.
 
 ## Prerequis
 
@@ -178,6 +211,15 @@ make cleanup-all
 ```bash
 make status
 make hosts
+```
+
+Tu peux aussi verifier les interfaces web directement:
+
+```bash
+http://localhost:8080   # Zabbix
+http://localhost:8081   # Machine 1 - Users
+http://localhost:8082   # Machine 2 - Products
+http://localhost:8083   # Machine 3 - Orders
 ```
 
 ## Documentation detaillee

@@ -1,10 +1,12 @@
 # Images used in README
 
-The README now uses `monitoring-overview.svg` by default to avoid broken images.
+This folder now contains the screenshots used by the main project documentation:
 
-If you want to replace the placeholder with real screenshots, place them in this folder with these exact names:
+- `hosts.png`
+- `Machine1.png`
+- `Machine2.png`
+- `Machine3.png`
 
-- `zabbix-hosts.png`
-- `docker-containers.png`
+`monitoring-overview.svg` remains available as a generic fallback visual.
 
 Then they will render automatically in `/root/Zabbix/README.md`.
