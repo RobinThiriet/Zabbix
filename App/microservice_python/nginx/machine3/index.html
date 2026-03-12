@@ -1,5 +1,176 @@
 <!doctype html>
 <html lang="fr">
-  <head><meta charset="utf-8"><title>Machine 3</title></head>
-  <body><h1>Machine 3 - Web OK</h1></body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Machine 3</title>
+    <style>
+      :root {
+        --bg: #0f1020;
+        --panel: rgba(18, 20, 42, 0.9);
+        --text: #f1f3fe;
+        --muted: #b6bddf;
+        --line: rgba(255, 255, 255, 0.1);
+        --accent: #6e78f0;
+        --accent-soft: rgba(110, 120, 240, 0.16);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(110, 120, 240, 0.18), transparent 30%),
+          linear-gradient(135deg, #090a17 0%, #0f1020 44%, #181b39 100%);
+        display: grid;
+        place-items: center;
+        padding: 28px;
+      }
+
+      .page {
+        width: min(1120px, 100%);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: 0 28px 72px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 20px;
+        padding: 36px;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.82rem;
+      }
+
+      h1 {
+        margin: 18px 0 14px;
+        font-size: clamp(2.6rem, 6vw, 4.8rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 1.02rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 26px;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.84rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .value {
+        display: block;
+        font-size: 1.35rem;
+        font-weight: 700;
+      }
+
+      .side {
+        display: grid;
+        gap: 14px;
+      }
+
+      .banner {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .footer {
+        border-top: 1px solid var(--line);
+        padding: 18px 36px 26px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 860px) {
+        .hero,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <span class="tag">Machine 3</span>
+          <h1>Presence web claire, design propre, statut immediat.</h1>
+          <p>
+            Page d'accueil professionnelle pour la machine 3, avec une lecture
+            directe du service expose et une presentation homogene sur les trois noeuds.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <span class="label">Etat</span>
+              <strong class="value">Online</strong>
+            </article>
+            <article class="card">
+              <span class="label">Port public</span>
+              <strong class="value">8083</strong>
+            </article>
+            <article class="card">
+              <span class="label">Service</span>
+              <strong class="value">web-machine-3</strong>
+            </article>
+          </div>
+        </div>
+        <aside class="side">
+          <article class="card">
+            <span class="banner">Service web disponible</span>
+            <h2>Lecture immediate</h2>
+            <p>La machine 3 confirme l'accessibilite HTTP et reste facilement identifiable dans l'ensemble de la stack.</p>
+          </article>
+          <article class="card">
+            <h2>Positionnement</h2>
+            <p>Rendu simple, plus institutionnel, adapte a une presentation de projet ou a une validation d'environnement.</p>
+          </article>
+        </aside>
+      </section>
+      <div class="footer">Machine 3 | Nginx frontend | Port 8083 | Service web disponible</div>
+    </main>
+  </body>
 </html>

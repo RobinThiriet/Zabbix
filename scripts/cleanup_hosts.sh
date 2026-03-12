@@ -7,7 +7,7 @@ APPLY=false
 MODE="c3"
 
 usage() {
-  echo "Usage: $0 [--dry-run|--apply] [--mode c1|c2|c3]"
+  echo "Usage: $0 [--dry-run|--apply] [--mode c1|c2|c3|all]"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -41,6 +41,7 @@ case "$MODE" in
   c1) KEEP_REGEX='^(Zabbix server)$' ;;
   c2) KEEP_REGEX='^(Zabbix server|agent-1|agent-2|agent-3|agent-4)$' ;;
   c3) KEEP_REGEX='^(Zabbix server|machine-1|machine-2|machine-3)$' ;;
+  all) KEEP_REGEX='^(Zabbix server|agent-1|agent-2|agent-3|agent-4|machine-1|machine-2|machine-3)$' ;;
   *) echo "Invalid mode: $MODE"; exit 1 ;;
 esac
 

@@ -70,7 +70,6 @@ docker compose -f monitoring-compose.yml up -d --build
 
 Architecture simulee:
 - Machine 1: `web-machine-1` (Nginx, port 8081) + `api-machine-1` + `zbx-agent-machine-1`
-- Machine 1: `web-machine-1` (Nginx, port 8181) + `api-machine-1` + `zbx-agent-machine-1`
 - Machine 2: `web-machine-2` (Nginx, port 8082) + `api-machine-2` + `zbx-agent-machine-2`
 - Machine 3: `web-machine-3` (Nginx, port 8083) + `api-machine-3` + `zbx-agent-machine-3`
 
@@ -97,7 +96,6 @@ Indicateurs cles proposes:
 - CPU (%), RAM, charge systeme
 - Nombre de problemes actifs
 - Disponibilite web (via checks HTTP simples sur ports 8081/8082/8083)
-- Disponibilite web (via checks HTTP simples sur ports 8181/8082/8083)
 
 ## Commandes de verification
 ```bash
